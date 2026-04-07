@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Activity Tracker</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f4f4;
+}
+
+/* HEADER */
+header {
+    background: #6b7280;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+/* NAVBAR */
+nav {
+    background: #1f2937;
+    padding: 12px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 15px;
+    text-decoration: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* MAIN */
+.container {
+    text-align: center;
+    padding: 30px;
+}
+
+/* TITLE */
+h1 {
+    margin-bottom: 10px;
+}
+
+/* BUTTON */
+.btn {
+    background: #9ca3af;
+    border: none;
+    padding: 10px 20px;
+    margin: 15px;
+    cursor: pointer;
+}
+
+/* CARDS */
+.cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    width: 250px;
+    border-radius: 8px;
+}
+
+/* SECTIONS */
+.section {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+/* INPUT */
+input {
+    padding: 10px;
+    width: 60%;
+}
+
+/* LIST */
+li {
+    list-style: none;
+    margin: 10px;
+}
+
+.done {
+    text-decoration: line-through;
+    color: gray;
+}
+
+/* PROGRESS */
+.progress {
+    width: 60%;
+    margin: auto;
+    background: #ddd;
+    height: 20px;
+    border-radius: 10px;
+}
+
+.bar {
+    height: 100%;
+    background: green;
+    width: 0%;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Student Activity Tracker</h2>
+    <p>Track, Manage and Improve Student Activities</p>
+</header>
+
+<nav>
+    <a onclick="show('home')">Home</a>
+    <a onclick="show('activities')">Activities</a>
+    <a onclick="show('reports')">Reports</a>
+    <a>Login</a>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="container section active">
+    <h1>Welcome to Student Activity Tracker</h1>
+    <p>Monitor academic, sports and extracurricular activities easily.</p>
+
+    <button class="btn" onclick="show('activities')">Get Started</button>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Add Activities</h3>
+            <p>Students can add daily academic and extracurricular activities.</p>
+        </div>
+
+        <div class="card">
+            <h3>Track Progress</h3>
+            <p>Monitor activity progress and achievements in one place.</p>
+        </div>
+
+        <div class="card">
+            <h3>Generate Reports</h3>
+            <p>View reports of student performance and activity records.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ACTIVITIES -->
+<div id="activities" class="container section">
+
+    <h2>Add Activity</h2>
+    <input id="input" placeholder="Enter activity">
+    <button onclick="add()">Add</button>
+
+    <ul id="list"></ul>
+
+    <h3>Progress</h3>
+    <div class="progress">
+        <div id="bar" class="bar"></div>
+    </div>
+    <p id="text"></p>
+
+</div>
+
+<!-- REPORT -->
+<div id="reports" class="container section">
+    <h2>Report</h2>
+    <p id="report"></p>
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("data")) || [];
+
+// NAVIGATION
+function show(id){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    if(id==="reports") report();
+}
+
+// ADD
+function add(){
+    let input = document.getElementById("input");
+
+    if(input.value==="") return;
+
+    data.push({name:input.value, done:false});
+    input.value="";
+
+    update();
+}
+
+// TOGGLE
+function toggle(i){
+    data[i].done=!data[i].done;
+    update();
+}
+
+// DELETE
+function del(i){
+    data.splice(i,1);
+    update();
+}
+
+// UPDATE UI
+function update(){
+
+    let list=document.getElementById("list");
+    list.innerHTML="";
+
+    let done=0;
+
+    data.forEach((d,i)=>{
+        let li=document.createElement("li");
+
+        li.innerHTML=`
+            <span class="${d.done?'done':''}">${d.name}</span>
+            <button onclick="toggle(${i})">✔</button>
+            <button onclick="del(${i})">❌</button>
+        `;
+
+        if(d.done) done++;
+
+        list.appendChild(li);
+    });
+
+    let percent=data.length?(done/data.length)*100:0;
+    document.getElementById("bar").style.width=percent+"%";
+    document.getElementById("text").innerText=done+"/"+data.length+" Completed";
+
+    localStorage.setItem("data",JSON.stringify(data));
+}
+
+// REPORT
+function report(){
+    let total=data.length;
+    let done=data.filter(d=>d.done).length;
+
+    document.getElementById("report").innerHTML=
+        "Total: "+total+"<br>Completed: "+done+"<br>Pending: "+(total-done);
+}
+
+update();
+
+</script>
+
+</body>
+</html>
