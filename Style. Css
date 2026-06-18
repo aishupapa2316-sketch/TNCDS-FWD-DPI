@@ -1,0 +1,13 @@
+let users=[];
+
+function register(){
+let email=document.getElementById("email").value;
+
+if(users.includes(email)){
+msg.innerHTML="Already Registered";
+}
+else{
+users.push(email);
+msg.innerHTML="Success";
+}
+}
