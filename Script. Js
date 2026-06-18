@@ -1,0 +1,9 @@
+body{
+text-align:center;
+margin:40px;
+}
+
+input,button{
+padding:8px;
+margin:5px;
+}
